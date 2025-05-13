@@ -1,7 +1,0 @@
-FROM oven/bun:1.2.2
-
-# Set the working directory
-WORKDIR /app
-
-# Run app.py when the container launches
-CMD ["bun", "run", "apps:web:dev"]

@@ -1,13 +1,25 @@
-import '@/lib/i18n';
-import '@/assets/styles/index.css';
-
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { Providers } from '@/providers';
+import { Provider } from '@/components/providers';
+import { logger } from '@/lib/logger';
 
-createRoot(document.getElementById('root')!).render(
+import '@/assets/styles/styles.css';
+
+import '@/lib/i18n';
+
+const rootElement = document.getElementById('app');
+
+if (rootElement && !rootElement.innerHTML) {
+  const root = createRoot(rootElement);
+  root.render(
     <StrictMode>
-        <Providers />
+      <Provider />
     </StrictMode>,
-);
+  );
+
+  logger.debug('React app mounted successfully.');
+}
+else {
+  logger.error('Failed to mount React app: root element is missing or already has content.');
+}

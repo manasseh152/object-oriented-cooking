@@ -1,0 +1,17 @@
+{
+  "selectPlaceholder": "Select a language",
+  "languageSelectorTitle": "Language selector",
+  "languageSelectorAriaLabel": "Language selector",
+  "languageSelectorAriaDescription": "Select a language for the application. \nThe selected language will be applied to the entire application.",
+  "languages": {
+    "en": "English",
+    "nl": "Dutch",
+    "fr": "French",
+    "de": "German",
+    "es": "Spanish",
+    "it": "Italian",
+    "pt": "Portuguese",
+    "ru": "Russian",
+    "zh": "Chinese"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "editInstructionPrefix": "Edit ",
+  "editInstructionHighlight": "src/routes/index.tsx",
+  "editInstructionSuffix": " and save to reload."
+}

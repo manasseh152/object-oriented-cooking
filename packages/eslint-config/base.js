@@ -1,31 +1,38 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import onlyWarn from 'eslint-plugin-only-warn';
-import tseslint from 'typescript-eslint';
+import antfu from '@antfu/eslint-config';
 
-/**
- * A shared ESLint configuration for the repository.
- *
- * @type {import("eslint").Linter.Config}
- **/
-export const config = [
-    {
-        ignores: ['dist/**'],
+export default antfu(
+  {
+    type: 'app',
+    typescript: true,
+    formatters: true,
+    stylistic: {
+      indent: 2,
+      semi: true,
+      quotes: 'single',
     },
-    {
-        extends: [
-            js.configs.recommended,
-            eslintConfigPrettier,
-            ...tseslint.configs.recommended,
-        ],
-        files: ['**/*.{ts,tsx,js,jsx}'],
-        languageOptions: {
-            ecmaVersion: 2020,
-            globals: globals.browser,
+    ignores: ['src/routeTree.gen.ts'],
+  },
+  {
+    rules: {
+      'ts/no-redeclare': 'off',
+      'ts/consistent-type-definitions': ['error', 'type'],
+      'no-console': ['warn'],
+      'antfu/no-top-level-await': ['off'],
+      'node/prefer-global/process': ['off'],
+      'node/no-process-env': ['error'],
+      'perfectionist/sort-imports': [
+        'error',
+        {
+          tsconfigRootDir: '.',
         },
-        plugins: {
-            onlyWarn,
+      ],
+      'unicorn/filename-case': [
+        'error',
+        {
+          case: 'kebabCase',
+          ignore: ['README.md'],
         },
+      ],
     },
-];
+  },
+);

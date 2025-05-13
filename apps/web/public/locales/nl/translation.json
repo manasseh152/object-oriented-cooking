@@ -1,0 +1,5 @@
+{
+  "editInstructionPrefix": "Bewerk ",
+  "editInstructionHighlight": "src/routes/index.tsx",
+  "editInstructionSuffix": " en sla op om te herladen."
+}

@@ -1,0 +1,11 @@
+{
+  "selectPlaceholder": "Select a theme",
+  "themeSelectorTitle": "Theme selector",
+  "themeSelectorAriaLabel": "Theme selector",
+  "themeSelectorAriaDescription": "Select a theme for the application.",
+  "themes": {
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System"
+  }
+}

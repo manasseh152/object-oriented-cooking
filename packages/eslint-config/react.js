@@ -1,28 +1,39 @@
-import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
+import antfu from '@antfu/eslint-config';
 
-import baseConfig from './base';
-
-/**
- * A shared ESLint configuration for the repository.
- *
- * @type {import("eslint").Linter.Config}
- **/
-export const config = [
-    {
-        ...baseConfig,
-        plugins: {
-            ...baseConfig.plugins,
-            'react-hooks': reactHooks,
-            'react-refresh': reactRefresh,
-        },
-        rules: {
-            ...baseConfig.rules,
-            ...reactHooks.configs.recommended.rules,
-            'react-refresh/only-export-components': [
-                'warn',
-                { allowConstantExport: true },
-            ],
-        },
+export default antfu(
+  {
+    type: 'app',
+    typescript: true,
+    formatters: true,
+    react: true,
+    stylistic: {
+      indent: 2,
+      semi: true,
+      quotes: 'double',
     },
-];
+    ignores: ['src/routeTree.gen.ts'],
+  },
+  {
+    rules: {
+      'ts/no-redeclare': 'off',
+      'ts/consistent-type-definitions': ['error', 'type'],
+      'no-console': ['warn'],
+      'antfu/no-top-level-await': ['off'],
+      'node/prefer-global/process': ['off'],
+      'node/no-process-env': ['error'],
+      'perfectionist/sort-imports': [
+        'error',
+        {
+          tsconfigRootDir: '.',
+        },
+      ],
+      'unicorn/filename-case': [
+        'error',
+        {
+          case: 'kebabCase',
+          ignore: ['README.md'],
+        },
+      ],
+    },
+  },
+);
