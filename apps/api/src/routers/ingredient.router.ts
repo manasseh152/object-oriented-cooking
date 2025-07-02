@@ -32,11 +32,14 @@ export const ingredientRouter = router({
   /**
    * Update an ingredient
    */
-  update: procedure.input(ingredientUpdateSchema).mutation(async ({ ctx, input }) => {
+  update: procedure.input(v.object({
+    ingredientId: v.string(),
+    data: ingredientUpdateSchema,
+  })).mutation(async ({ ctx, input }) => {
     const ingredient = await ctx.db
       .update(ingredientTable)
-      .set(input)
-      .where(o.eq(ingredientTable.id, Number(input.ingredientId)))
+      .set(input.data)
+      .where(o.eq(ingredientTable.ingredientId, input.ingredientId!))
       .returning()
       .then(ingredients => ingredients[0]);
 
@@ -49,7 +52,7 @@ export const ingredientRouter = router({
   delete: procedure.input(v.object({ ingredientId: v.string() })).mutation(async ({ ctx, input }) => {
     const ingredient = await ctx.db
       .delete(ingredientTable)
-      .where(o.eq(ingredientTable.id, Number(input.ingredientId)))
+      .where(o.eq(ingredientTable.ingredientId, input.ingredientId!))
       .returning()
       .then(ingredients => ingredients[0]);
 

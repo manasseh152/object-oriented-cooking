@@ -9,7 +9,7 @@ export const stepRouter = router({
    * Get all steps
    */
   getAll: procedure
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
       const steps = await ctx.db.query.stepTable.findMany({
         orderBy: [o.asc(stepTable.id)],
       });
@@ -33,11 +33,14 @@ export const stepRouter = router({
   /**
    * Update a step
    */
-  update: procedure.input(stepUpdateSchema).mutation(async ({ ctx, input }) => {
+  update: procedure.input(v.object({
+    stepId: v.string(),
+    data: stepUpdateSchema,
+  })).mutation(async ({ ctx, input }) => {
     const step = await ctx.db
       .update(stepTable)
-      .set(input)
-      .where(o.eq(stepTable.id, Number(input.stepId)))
+      .set(input.data)
+      .where(o.eq(stepTable.stepId, input.stepId!))
       .returning()
       .then(steps => steps[0]);
 
@@ -50,7 +53,7 @@ export const stepRouter = router({
   delete: procedure.input(v.object({ stepId: v.string() })).mutation(async ({ ctx, input }) => {
     const step = await ctx.db
       .delete(stepTable)
-      .where(o.eq(stepTable.id, Number(input.stepId)))
+      .where(o.eq(stepTable.stepId, input.stepId!))
       .returning()
       .then(steps => steps[0]);
 
@@ -74,7 +77,7 @@ export const stepRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const updates = input.steps.map(step => ({
-        id: Number(step.stepId),
+        stepId: step.stepId,
         order: step.order,
       }));
 
@@ -83,7 +86,7 @@ export const stepRouter = router({
           ctx.db
             .update(stepTable)
             .set({ order: update.order })
-            .where(o.eq(stepTable.id, update.id))
+            .where(o.eq(stepTable.stepId, update.stepId!))
             .returning()
             .then(steps => steps[0]),
         ),

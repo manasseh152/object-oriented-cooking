@@ -5,7 +5,7 @@ import * as v from 'valibot';
 
 import { commonTimestamps } from '../config';
 import { measurementUnitTable } from './measurements';
-import { tagTable } from './tags';
+import { recipeTagTable, tagTable } from './tags';
 
 export const RECIPE_DIFFICULTY = ['easy', 'medium', 'hard', 'expert'] as const;
 export const recipeDifficulty = t.pgEnum('recipe_difficulty', RECIPE_DIFFICULTY);
@@ -71,6 +71,10 @@ export const recipeIngredientTable = t.pgTable(
   'recipe_ingredients',
   {
     id: t.serial('id').primaryKey(),
+    recipeIngredientId: t
+      .uuid('recipe_ingredient_id')
+      .notNull()
+      .default(sql`uuid_generate_v4()`),
     recipeId: t
       .integer('recipe_id')
       .notNull()
@@ -121,6 +125,14 @@ export const stepTable = t.pgTable(
 
 // Set up relations
 export const recipeRelations = relations(recipeTable, ({ one, many }) => ({
+  parentRecipe: one(recipeTable, {
+    fields: [recipeTable.parentRecipeId],
+    references: [recipeTable.id],
+    relationName: 'recipe:parent',
+  }),
+  children: many(recipeTable, {
+    relationName: 'recipe:parent',
+  }),
   tag: one(tagTable, {
     fields: [recipeTable.tagId],
     references: [tagTable.id],
@@ -128,6 +140,7 @@ export const recipeRelations = relations(recipeTable, ({ one, many }) => ({
   }),
   ingredients: many(recipeIngredientTable, { relationName: 'recipe:ingredients' }),
   steps: many(stepTable, { relationName: 'recipe:steps' }),
+  recipeTags: many(recipeTagTable, { relationName: 'recipe:tags' }),
 }));
 
 export const ingredientRelations = relations(ingredientTable, ({ many }) => ({
@@ -148,7 +161,7 @@ export const recipeIngredientRelations = relations(recipeIngredientTable, ({ one
   unit: one(measurementUnitTable, {
     fields: [recipeIngredientTable.unitId],
     references: [measurementUnitTable.id],
-    relationName: 'recipe:ingredients',
+    relationName: 'unit:recipeIngredients',
   }),
 }));
 
@@ -156,7 +169,7 @@ export const stepRelations = relations(stepTable, ({ one }) => ({
   recipe: one(recipeTable, {
     fields: [stepTable.recipeId],
     references: [recipeTable.id],
-    relationName: 'step:recipe',
+    relationName: 'recipe:steps',
   }),
 }));
 

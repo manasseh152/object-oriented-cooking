@@ -44,11 +44,14 @@ export const tagRouter = router({
   /**
    * Update a tag
    */
-  update: procedure.input(tagUpdateSchema).mutation(async ({ ctx, input }) => {
+  update: procedure.input(v.object({
+    tagId: v.string(),
+    data: tagUpdateSchema,
+  })).mutation(async ({ ctx, input }) => {
     const tag = await ctx.db
       .update(tagTable)
-      .set(input)
-      .where(o.eq(tagTable.id, Number(input.tagId)))
+      .set(input.data)
+      .where(o.eq(tagTable.tagId, input.tagId!))
       .returning()
       .then(tags => tags[0]);
 
@@ -60,7 +63,7 @@ export const tagRouter = router({
   delete: procedure.input(v.object({ tagId: v.string() })).mutation(async ({ ctx, input }) => {
     const tag = await ctx.db
       .delete(tagTable)
-      .where(o.eq(tagTable.id, Number(input.tagId)))
+      .where(o.eq(tagTable.tagId, input.tagId!))
       .returning()
       .then(tags => tags[0]);
 

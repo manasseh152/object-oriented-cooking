@@ -58,18 +58,19 @@ export const tagRelations = relations(tagTable, ({ many, one }) => ({
     relationName: 'tag:parent',
   }),
   recipes: many(recipeTagTable, { relationName: 'tag:recipes' }),
+  primaryRecipes: many(recipeTable, { relationName: 'recipe:tag' }),
 }));
 
 export const recipeTagRelations = relations(recipeTagTable, ({ one }) => ({
   recipe: one(recipeTable, {
     fields: [recipeTagTable.recipeId],
     references: [recipeTable.id],
-    relationName: 'recipe:tag',
+    relationName: 'recipe:tags',
   }),
   tag: one(tagTable, {
     fields: [recipeTagTable.tagId],
     references: [tagTable.id],
-    relationName: 'tag:recipe',
+    relationName: 'tag:recipes',
   }),
 }));
 

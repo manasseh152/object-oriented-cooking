@@ -1,0 +1,1 @@
+ALTER TABLE "recipe_ingredients" ADD COLUMN "recipe_ingredient_id" uuid DEFAULT uuid_generate_v4() NOT NULL;
