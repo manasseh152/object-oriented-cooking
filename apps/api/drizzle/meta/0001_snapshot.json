@@ -1,5 +1,5 @@
 {
-  "id": "2dacbaaf-6460-4a69-ab23-050b81c2c491",
+  "id": "fefb6bd2-ba0e-43b0-a070-a0a056326eac",
   "prevId": "6fdb3f25-8b07-46fb-86b0-a06f77de415d",
   "version": "7",
   "dialect": "postgresql",
@@ -117,132 +117,12 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.password_resets": {
-      "name": "password_resets",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "token": {
-          "name": "token",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
+      "checkConstraints": {
+        "check_auth_method_password_hash_not_null": {
+          "name": "check_auth_method_password_hash_not_null",
+          "value": "\"auth_methods\".\"type\" = 'EMAIL_PASSWORD' AND \"auth_methods\".\"password_hash\" IS NOT NULL"
         }
       },
-      "indexes": {
-        "idx_password_resets_user_id": {
-          "name": "idx_password_resets_user_id",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_password_resets_token": {
-          "name": "idx_password_resets_token",
-          "columns": [
-            {
-              "expression": "token",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_password_resets_expires_at": {
-          "name": "idx_password_resets_expires_at",
-          "columns": [
-            {
-              "expression": "expires_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "password_resets_user_id_users_id_fk": {
-          "name": "password_resets_user_id_users_id_fk",
-          "tableFrom": "password_resets",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "password_resets_token_unique": {
-          "name": "password_resets_token_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.sessions": {
@@ -358,6 +238,139 @@
         "sessions_user_id_users_id_fk": {
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_password_reset": {
+      "name": "user_password_reset",
+      "schema": "",
+      "columns": {
+        "reset_id": {
+          "name": "reset_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "secret_hash": {
+          "name": "secret_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "user_password_reset_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "used_at": {
+          "name": "used_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "user_password_reset_user_id_index": {
+          "name": "user_password_reset_user_id_index",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_password_reset_secret_hash_index": {
+          "name": "user_password_reset_secret_hash_index",
+          "columns": [
+            {
+              "expression": "secret_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_password_reset_expires_at_index": {
+          "name": "user_password_reset_expires_at_index",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_password_reset_created_at_index": {
+          "name": "user_password_reset_created_at_index",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "user_password_reset_user_id_users_id_fk": {
+          "name": "user_password_reset_user_id_users_id_fk",
+          "tableFrom": "user_password_reset",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -518,8 +531,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "unit_id": {
-          "name": "unit_id",
+        "measurement_unit_id": {
+          "name": "measurement_unit_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true,
@@ -605,11 +618,11 @@
         }
       },
       "indexes": {
-        "idx_measurement_units_unit_id": {
-          "name": "idx_measurement_units_unit_id",
+        "idx_measurement_units_measurement_unit_id": {
+          "name": "idx_measurement_units_measurement_unit_id",
           "columns": [
             {
-              "expression": "unit_id",
+              "expression": "measurement_unit_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1588,6 +1601,14 @@
       "schema": "public",
       "values": [
         "EMAIL_PASSWORD"
+      ]
+    },
+    "public.user_password_reset_type": {
+      "name": "user_password_reset_type",
+      "schema": "public",
+      "values": [
+        "reset",
+        "activation"
       ]
     },
     "public.user_role": {

@@ -1,4 +1,5 @@
 CREATE TYPE "public"."auth_method_type" AS ENUM('EMAIL_PASSWORD');--> statement-breakpoint
+CREATE TYPE "public"."user_password_reset_type" AS ENUM('reset', 'activation');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('USER', 'ADMIN');--> statement-breakpoint
 CREATE TYPE "public"."measurement_unit_system" AS ENUM('metric', 'imperial');--> statement-breakpoint
 CREATE TYPE "public"."measurement_unit_type" AS ENUM('count', 'weight', 'volume');--> statement-breakpoint
@@ -12,18 +13,8 @@ CREATE TABLE "auth_methods" (
 	"last_used_at" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	"deleted_at" timestamp
-);
---> statement-breakpoint
-CREATE TABLE "password_resets" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
-	"token" varchar(255) NOT NULL,
-	"expires_at" timestamp NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"deleted_at" timestamp,
-	CONSTRAINT "password_resets_token_unique" UNIQUE("token")
+	CONSTRAINT "check_auth_method_password_hash_not_null" CHECK ("auth_methods"."type" = 'EMAIL_PASSWORD' AND "auth_methods"."password_hash" IS NOT NULL)
 );
 --> statement-breakpoint
 CREATE TABLE "sessions" (
@@ -36,6 +27,16 @@ CREATE TABLE "sessions" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"deleted_at" timestamp
+);
+--> statement-breakpoint
+CREATE TABLE "user_password_reset" (
+	"reset_id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"user_id" integer,
+	"secret_hash" text NOT NULL,
+	"type" "user_password_reset_type" NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"used_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
@@ -54,7 +55,7 @@ CREATE TABLE "users" (
 --> statement-breakpoint
 CREATE TABLE "measurement_units" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"unit_id" uuid DEFAULT uuid_generate_v4() NOT NULL,
+	"measurement_unit_id" uuid DEFAULT uuid_generate_v4() NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"abbreviation" varchar(50) NOT NULL,
 	"description" text,
@@ -146,8 +147,8 @@ CREATE TABLE "tags" (
 );
 --> statement-breakpoint
 ALTER TABLE "auth_methods" ADD CONSTRAINT "auth_methods_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "password_resets" ADD CONSTRAINT "password_resets_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_password_reset" ADD CONSTRAINT "user_password_reset_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "measurement_units" ADD CONSTRAINT "measurement_units_base_unit_id_measurement_units_id_fk" FOREIGN KEY ("base_unit_id") REFERENCES "public"."measurement_units"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recipe_ingredients" ADD CONSTRAINT "recipe_ingredients_recipe_id_recipes_id_fk" FOREIGN KEY ("recipe_id") REFERENCES "public"."recipes"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recipe_ingredients" ADD CONSTRAINT "recipe_ingredients_ingredient_id_ingredients_id_fk" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -160,16 +161,17 @@ ALTER TABLE "recipe_tags" ADD CONSTRAINT "recipe_tags_tag_id_tags_id_fk" FOREIGN
 ALTER TABLE "tags" ADD CONSTRAINT "tags_parent_id_tags_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."tags"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_auth_methods_user_id" ON "auth_methods" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_auth_methods_type" ON "auth_methods" USING btree ("type");--> statement-breakpoint
-CREATE INDEX "idx_password_resets_user_id" ON "password_resets" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "idx_password_resets_token" ON "password_resets" USING btree ("token");--> statement-breakpoint
-CREATE INDEX "idx_password_resets_expires_at" ON "password_resets" USING btree ("expires_at");--> statement-breakpoint
 CREATE INDEX "idx_sessions_session_id" ON "sessions" USING btree ("session_id");--> statement-breakpoint
 CREATE INDEX "idx_sessions_user_id" ON "sessions" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_sessions_expires_at" ON "sessions" USING btree ("expires_at");--> statement-breakpoint
+CREATE INDEX "user_password_reset_user_id_index" ON "user_password_reset" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "user_password_reset_secret_hash_index" ON "user_password_reset" USING btree ("secret_hash");--> statement-breakpoint
+CREATE INDEX "user_password_reset_expires_at_index" ON "user_password_reset" USING btree ("expires_at");--> statement-breakpoint
+CREATE INDEX "user_password_reset_created_at_index" ON "user_password_reset" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "idx_users_user_id" ON "users" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_users_email" ON "users" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "idx_users_role" ON "users" USING btree ("role");--> statement-breakpoint
-CREATE INDEX "idx_measurement_units_unit_id" ON "measurement_units" USING btree ("unit_id");--> statement-breakpoint
+CREATE INDEX "idx_measurement_units_measurement_unit_id" ON "measurement_units" USING btree ("measurement_unit_id");--> statement-breakpoint
 CREATE INDEX "idx_measurement_units_name" ON "measurement_units" USING btree ("name");--> statement-breakpoint
 CREATE INDEX "idx_measurement_units_abbreviation" ON "measurement_units" USING btree ("abbreviation");--> statement-breakpoint
 CREATE INDEX "idx_measurement_units_type" ON "measurement_units" USING btree ("type");--> statement-breakpoint

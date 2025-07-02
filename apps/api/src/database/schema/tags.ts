@@ -19,7 +19,7 @@ export const tagTable = t.pgTable(
       .references((): t.AnyPgColumn => tagTable.id, { onDelete: 'cascade' }),
     name: t.varchar('name', { length: 255 }).notNull().unique(),
     color: t.varchar('color', { length: 7 }).notNull(),
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_tags_tag_id').on(table.tagId),

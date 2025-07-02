@@ -12,29 +12,22 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1748896066934,
+      "when": 1751494756462,
       "tag": "0001_init",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1748896084398,
+      "when": 1751494869372,
       "tag": "0002_add_updated_at_triggers",
       "breakpoints": true
     },
     {
       "idx": 3,
       "version": "7",
-      "when": 1748896230123,
+      "when": 1751494874797,
       "tag": "0003_seed",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1748909435216,
-      "tag": "0004_changed_measurement_units",
       "breakpoints": true
     }
   ]

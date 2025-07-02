@@ -9,53 +9,59 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Add triggers to all tables with updated_at column
-CREATE TRIGGER update_auth_methods_updated_at
+-- Create triggers for all tables with updated_at columns
+
+-- Auth methods table
+CREATE TRIGGER trigger_auth_methods_updated_at
     BEFORE UPDATE ON auth_methods
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_password_resets_updated_at
-    BEFORE UPDATE ON password_resets
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_sessions_updated_at
+-- Sessions table
+CREATE TRIGGER trigger_sessions_updated_at
     BEFORE UPDATE ON sessions
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_users_updated_at
+-- Users table
+CREATE TRIGGER trigger_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_measurement_units_updated_at
+-- Measurement units table
+CREATE TRIGGER trigger_measurement_units_updated_at
     BEFORE UPDATE ON measurement_units
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_ingredients_updated_at
+-- Ingredients table
+CREATE TRIGGER trigger_ingredients_updated_at
     BEFORE UPDATE ON ingredients
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_recipe_ingredients_updated_at
+-- Recipe ingredients table
+CREATE TRIGGER trigger_recipe_ingredients_updated_at
     BEFORE UPDATE ON recipe_ingredients
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_recipes_updated_at
+-- Recipes table
+CREATE TRIGGER trigger_recipes_updated_at
     BEFORE UPDATE ON recipes
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_steps_updated_at
+-- Steps table
+CREATE TRIGGER trigger_steps_updated_at
     BEFORE UPDATE ON steps
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_tags_updated_at
+-- Tags table
+CREATE TRIGGER trigger_tags_updated_at
     BEFORE UPDATE ON tags
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+

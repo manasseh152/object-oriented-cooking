@@ -10,7 +10,7 @@ export default antfu(
       semi: true,
       quotes: 'single',
     },
-    ignores: ['src/routeTree.gen.ts'],
+    ignores: ['src/routeTree.gen.ts', 'drizzle/meta/**'],
   },
   {
     rules: {

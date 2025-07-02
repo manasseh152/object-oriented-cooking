@@ -23,7 +23,7 @@ export const ingredientTable = t.pgTable(
       .default(sql`uuid_generate_v4()`),
     name: t.varchar('name', { length: 255 }).notNull().unique(),
     description: t.text('description'),
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_ingredients_ingredient_id').on(table.ingredientId),
@@ -55,7 +55,7 @@ export const recipeTable = t.pgTable(
     difficulty: recipeDifficulty('difficulty').default('medium'),
     notes: t.text('notes'),
     isPublished: t.boolean('is_published').default(false),
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_recipes_recipe_id').on(table.recipeId),
@@ -85,7 +85,7 @@ export const recipeIngredientTable = t.pgTable(
     quantity: t.doublePrecision('quantity').notNull(),
     isOptional: t.boolean('is_optional').default(false),
     notes: t.text('notes'),
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_recipe_ingredients_recipe_id').on(table.recipeId),
@@ -110,7 +110,7 @@ export const stepTable = t.pgTable(
     instruction: t.text('instruction').notNull(),
     imageUrl: t.varchar('image_url', { length: 512 }),
     duration: t.integer('duration'), // Optional duration in minutes
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_steps_step_id').on(table.stepId),
@@ -126,8 +126,8 @@ export const recipeRelations = relations(recipeTable, ({ one, many }) => ({
     references: [tagTable.id],
     relationName: 'recipe:tag',
   }),
-  ingredients: many(recipeIngredientTable),
-  steps: many(stepTable),
+  ingredients: many(recipeIngredientTable, { relationName: 'recipe:ingredients' }),
+  steps: many(stepTable, { relationName: 'recipe:steps' }),
 }));
 
 export const ingredientRelations = relations(ingredientTable, ({ many }) => ({

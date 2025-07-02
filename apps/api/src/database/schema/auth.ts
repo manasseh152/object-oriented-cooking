@@ -28,7 +28,7 @@ export const userTable = t.pgTable(
     lastName: t.varchar('last_name', { length: 100 }),
     role: userRole('role').notNull().default('USER'),
     emailVerified: t.boolean('email_verified').default(false),
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_users_user_id').on(table.userId),
@@ -47,17 +47,19 @@ export const authMethodTable = t.pgTable(
       .notNull()
       .references(() => userTable.id, { onDelete: 'cascade' }),
     type: authMethodType('type').notNull(),
+
     // For email/password auth
     passwordHash: t.varchar('password_hash', { length: 255 }),
 
     // Common fields
     isEnabled: t.boolean('is_enabled').notNull().default(true),
     lastUsedAt: t.timestamp('last_used_at'),
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_auth_methods_user_id').on(table.userId),
     t.index('idx_auth_methods_type').on(table.type),
+    t.check('check_auth_method_password_hash_not_null', sql`${table.type} = 'EMAIL_PASSWORD' AND ${table.passwordHash} IS NOT NULL`),
   ],
 );
 
@@ -77,7 +79,7 @@ export const sessionTable = t.pgTable(
     expiresAt: t.timestamp('expires_at').notNull(),
     userAgent: t.varchar('user_agent', { length: 255 }),
     ipAddress: t.varchar('ip_address', { length: 45 }),
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_sessions_session_id').on(table.sessionId),
@@ -87,29 +89,36 @@ export const sessionTable = t.pgTable(
 );
 
 // Password reset tokens
-export const passwordResetTable = t.pgTable(
-  'password_resets',
+export const USER_PASSWORD_RESET_TYPE = ['reset', 'activation'] as const;
+export const userPasswordResetTypeEnum = t.pgEnum('user_password_reset_type', USER_PASSWORD_RESET_TYPE);
+export type UserPasswordResetType = (typeof USER_PASSWORD_RESET_TYPE)[number];
+
+export const userPasswordResetTable = t.pgTable(
+  'user_password_reset',
   {
-    id: t.serial('id').primaryKey(),
-    userId: t
-      .integer('user_id')
-      .notNull()
-      .references(() => userTable.id, { onDelete: 'cascade' }),
-    token: t.varchar('token', { length: 255 }).notNull().unique(),
+    resetId: t
+      .uuid('reset_id')
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`),
+    userId: t.integer('user_id').references(() => userTable.id, { onDelete: 'cascade' }),
+    secretHash: t.text('secret_hash').notNull(),
+    type: userPasswordResetTypeEnum('type').notNull(), // 'reset' or 'activation'
     expiresAt: t.timestamp('expires_at').notNull(),
-    ...commonTimestamps,
+    usedAt: t.timestamp('used_at'),
+    createdAt: t.timestamp('created_at').defaultNow().notNull(),
   },
   table => [
-    t.index('idx_password_resets_user_id').on(table.userId),
-    t.index('idx_password_resets_token').on(table.token),
-    t.index('idx_password_resets_expires_at').on(table.expiresAt),
+    t.index('user_password_reset_user_id_index').on(table.userId),
+    t.index('user_password_reset_secret_hash_index').on(table.secretHash),
+    t.index('user_password_reset_expires_at_index').on(table.expiresAt),
+    t.index('user_password_reset_created_at_index').on(table.createdAt),
   ],
 );
 
 // Set up relations
 export const userRelations = relations(userTable, ({ many }) => ({
   sessions: many(sessionTable, { relationName: 'user:sessions' }),
-  passwordResets: many(passwordResetTable, { relationName: 'user:passwordResets' }),
+  passwordResets: many(userPasswordResetTable, { relationName: 'user:passwordResets' }),
   authMethods: many(authMethodTable, { relationName: 'user:authMethods' }),
 }));
 
@@ -121,9 +130,9 @@ export const sessionRelations = relations(sessionTable, ({ one }) => ({
   }),
 }));
 
-export const passwordResetRelations = relations(passwordResetTable, ({ one }) => ({
+export const userPasswordResetRelations = relations(userPasswordResetTable, ({ one }) => ({
   user: one(userTable, {
-    fields: [passwordResetTable.userId],
+    fields: [userPasswordResetTable.userId],
     references: [userTable.id],
     relationName: 'passwordReset:user',
   }),

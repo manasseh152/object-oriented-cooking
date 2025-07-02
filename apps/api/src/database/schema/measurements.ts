@@ -35,7 +35,7 @@ export const measurementUnitTable = t.pgTable(
       .references((): t.AnyPgColumn => measurementUnitTable.id),
     isBaseUnit: t.boolean('is_base_unit').default(false),
     isActive: t.boolean('is_active').default(true),
-    ...commonTimestamps,
+    ...commonTimestamps(),
   },
   table => [
     t.index('idx_measurement_units_measurement_unit_id').on(table.measurementUnitId),
