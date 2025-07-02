@@ -1,19 +1,13 @@
-import { RouterProvider } from "@tanstack/react-router";
-
+import { RouterProvider } from "@/components/providers/router";
 import { ThemeProvider } from "@/components/providers/theme";
-import { router } from "@/lib/router";
-
-import { LanguageProvider } from "./language";
-import { TRPCProvider } from "./trpc";
+import { TRPCProvider } from "@/components/providers/trpc";
 
 export function Provider() {
   return (
-    <LanguageProvider>
-      <TRPCProvider>
-        <ThemeProvider>
-          <RouterProvider router={router} />
-        </ThemeProvider>
-      </TRPCProvider>
-    </LanguageProvider>
+    <TRPCProvider>
+      <ThemeProvider>
+        <RouterProvider />
+      </ThemeProvider>
+    </TRPCProvider>
   );
 }

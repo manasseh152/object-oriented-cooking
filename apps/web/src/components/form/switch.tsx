@@ -1,98 +1,46 @@
 /* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from "react";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
+import { Label } from "@/components/ui/label";
+import { Switch as PrimitiveSwitch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
-import type { PrimitiveValueType } from './form-utils';
+import type { PrimativeFieldProps, PrimativeFormPropsOmit, PrimativeLabelType } from "../../lib/utils";
 
-export type FormSwitchProps<
-  TOnValue extends PrimitiveValueType = true,
-  TOffValue extends PrimitiveValueType = false,
-> = HTMLAttributes<HTMLDivElement> & {
-  value: TOnValue | TOffValue;
-  onChange: (value: TOnValue | TOffValue) => void;
-  onBlur?: () => void;
-  id?: string;
-  label?: string;
+export type SwitchProps = Omit<HTMLAttributes<HTMLDivElement>, PrimativeFormPropsOmit> & PrimativeFieldProps<boolean | null> & {
+  label?: PrimativeLabelType;
   disabled?: boolean;
-  className?: string;
-  onValue?: TOnValue;
-  offValue?: TOffValue;
-  checked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
 };
 
-export function FormSwitch<
-  TOnValue extends PrimitiveValueType = true,
-  TOffValue extends PrimitiveValueType = false,
->(props: FormSwitchProps<TOnValue, TOffValue>) {
-  const {
-    value,
-    onChange,
-    onBlur,
-    id,
-    label,
-    disabled,
-    className,
-    onValue: propOnValue,
-    offValue: propOffValue,
-    checked: propChecked,
-    onCheckedChange,
-    ...restProps
-  } = props;
-  const [checked, setChecked] = useState<boolean>(false);
+export function Switch(props: SwitchProps) {
+  const { name, value, onChange, onBlur, label, className, disabled, ...restProps } = props;
 
-  // Set default values for on/off if not provided
-  const onValue = propOnValue !== undefined ? propOnValue : (true as TOnValue);
-  const offValue
-    = propOffValue !== undefined ? propOffValue : (false as TOffValue);
+  const [checked, setChecked] = useState(value);
+  const id = `switch-${name}`;
 
-  // Keep the UI display in sync with the value
   useEffect(() => {
-    // If propChecked is provided, use that for controlled behavior
-    if (propChecked !== undefined) {
-      setChecked(propChecked);
-    }
-    else {
-      // Otherwise, determine checked state by comparing with onValue
-      setChecked(value === onValue);
-    }
-  }, [value, onValue, propChecked]);
+    setChecked(!!value);
+  }, [value]);
 
-  const handleCheckedChange = (isChecked: boolean) => {
-    // If onCheckedChange is provided, call that (for controlled behavior)
-    if (onCheckedChange) {
-      onCheckedChange(isChecked);
-    }
-    else {
-      // Otherwise, update the value based on checked state
-      onChange(isChecked ? onValue : offValue);
-    }
-  };
+  function handleCheckedChange(checked: boolean) {
+    onChange(checked);
+  }
 
   return (
-    <div
-      className={cn('flex items-center space-x-2', className)}
-      {...restProps}
-    >
-      <Switch
+    <div className={cn("flex items-center gap-2", className)} {...restProps}>
+      <PrimitiveSwitch
         id={id}
-        checked={checked}
+        name={name}
+        checked={checked ?? false}
         onCheckedChange={handleCheckedChange}
-        disabled={disabled}
         onBlur={onBlur}
+        disabled={disabled}
       />
-      {label && (
-        <label
-          htmlFor={id}
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          {label}
-        </label>
-      )}
+      {label && <Label htmlFor={id} disabled={disabled}>{label}</Label>}
     </div>
   );
 }
+
+Switch.displayName = "Switch";

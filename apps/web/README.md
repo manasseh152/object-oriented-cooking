@@ -44,7 +44,7 @@ Now that you have two routes you can use a `Link` component to navigate between 
 To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
 
 ```tsx
-import { Link } from '@tanstack/react-router';
+import { Link } from "@tanstack/react-router";
 ```
 
 Then anywhere in your JSX you can use it like so:
@@ -64,8 +64,8 @@ In the File Based Routing setup the layout is located in `src/routes/__root.tsx`
 Here is an example layout that includes a header:
 
 ```tsx
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 export const Route = createRootRoute({
   component: () => (
@@ -96,9 +96,9 @@ For example:
 ```tsx
 const peopleRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/people',
+  path: "/people",
   loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people');
+    const response = await fetch("https://swapi.dev/api/people");
     return response.json() as Promise<{
       results: {
         name: string;
@@ -133,7 +133,7 @@ bun install @tanstack/react-query @tanstack/react-query-devtools
 Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
 
 ```tsx
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // ...
 
@@ -155,7 +155,7 @@ if (!rootElement.innerHTML) {
 You can also add TanStack Query Devtools to the root route (optional).
 
 ```tsx
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -171,15 +171,15 @@ const rootRoute = createRootRoute({
 Now you can use `useQuery` to fetch your data.
 
 ```tsx
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
-import './App.css';
+import "./App.css";
 
 function App() {
   const { data } = useQuery({
-    queryKey: ['people'],
+    queryKey: ["people"],
     queryFn: () =>
-      fetch('https://swapi.dev/api/people')
+      fetch("https://swapi.dev/api/people")
         .then(res => res.json())
         .then(data => data.results as { name: string }[]),
     initialData: [],
@@ -214,10 +214,10 @@ bun install @tanstack/store
 Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
 
 ```tsx
-import { useStore } from '@tanstack/react-store';
-import { Store } from '@tanstack/store';
+import { useStore } from "@tanstack/react-store";
+import { Store } from "@tanstack/store";
 
-import './App.css';
+import "./App.css";
 
 const countStore = new Store(0);
 
@@ -227,7 +227,7 @@ function App() {
     <div>
       <button type="button" onClick={() => countStore.setState(n => n + 1)}>
         Increment -
-        {' '}
+        {" "}
         {count}
       </button>
     </div>
@@ -242,10 +242,10 @@ One of the many nice features of TanStack Store is the ability to derive state f
 Let's check this out by doubling the count using derived state.
 
 ```tsx
-import { useStore } from '@tanstack/react-store';
-import { Derived, Store } from '@tanstack/store';
+import { useStore } from "@tanstack/react-store";
+import { Derived, Store } from "@tanstack/store";
 
-import './App.css';
+import "./App.css";
 
 const countStore = new Store(0);
 
@@ -263,7 +263,7 @@ function App() {
     <div>
       <button type="button" onClick={() => countStore.setState(n => n + 1)}>
         Increment -
-        {' '}
+        {" "}
         {count}
       </button>
       <div>

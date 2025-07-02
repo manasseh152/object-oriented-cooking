@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
-import type { LogEntry, LogLevel, Transport } from '@/config/logger';
+import type { LogEntry, LogLevel, Transport } from "@/config/logger";
 
-import { LOG_LEVELS } from '@/config/logger';
+import { LOG_LEVELS } from "@/config/logger";
 
 export type ConsoleTransportOptions = {
   level?: LogLevel;
@@ -15,7 +15,7 @@ export class ConsoleTransport implements Transport {
   public level: LogLevel;
 
   constructor(options: ConsoleTransportOptions = {}) {
-    this.level = options.level || 'INFO';
+    this.level = options.level || "INFO";
   }
 
   public log(entry: LogEntry): void {
@@ -50,7 +50,7 @@ export class ConsoleTransport implements Transport {
   private formatMessages(messages: any[]): string {
     return messages
       .map((msg) => {
-        if (typeof msg === 'string') {
+        if (typeof msg === "string") {
           return msg;
         }
         if (msg instanceof Error) {
@@ -62,10 +62,10 @@ export class ConsoleTransport implements Transport {
         }
         // eslint-disable-next-line unused-imports/no-unused-vars
         catch (error) {
-          return '[Unserializable Object]';
+          return "[Unserializable Object]";
         }
       })
-      .join(' '); // Join multiple messages with a space
+      .join(" "); // Join multiple messages with a space
   }
 
   private formatTimestamp(entry: LogEntry): string {

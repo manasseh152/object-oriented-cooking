@@ -1,6 +1,10 @@
 import { procedure, router } from '@/trpc';
 
+import { ingredientRouter } from './ingredient.router';
 import { measurementUnitRouter } from './measurement-unit.router';
+import { recipeRouter } from './recipe.router';
+import { stepRouter } from './step.router';
+import { tagRouter } from './tag.router';
 
 /**
  * Root router that merges all domain-specific routers
@@ -20,8 +24,21 @@ export const appRouter = router({
    */
   measurementUnit: measurementUnitRouter,
   /**
-   * Add more routers here as needed
+   * Recipe router
    */
+  recipe: recipeRouter,
+  /**
+   * Tag router
+   */
+  tag: tagRouter,
+  /**
+   * Ingredient router
+   */
+  ingredient: ingredientRouter,
+  /**
+   * Step router
+   */
+  step: stepRouter,
 });
 
 // Export type definition of API

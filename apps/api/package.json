@@ -1,10 +1,6 @@
 {
   "name": "@repo/api",
   "private": true,
-  "exports": {
-    "./*": "./src/routers/_app.router.ts",
-    "./trpc": "./src/routers/_app.router.ts"
-  },
   "main": "src/index.ts",
   "scripts": {
     "dev": "bun --watch src/index.ts",
@@ -13,6 +9,8 @@
   },
   "dependencies": {
     "@hono/trpc-server": "^0.3.4",
+    "@oslojs/crypto": "^1.0.1",
+    "@oslojs/encoding": "^1.1.0",
     "@trpc/server": "^11.1.2",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.41.0",

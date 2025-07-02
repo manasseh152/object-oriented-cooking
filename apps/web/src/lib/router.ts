@@ -1,29 +1,27 @@
-import type { AppRouter } from "@repo/api/routers";
 import type { QueryClient } from "@tanstack/react-query";
-import type { TRPCClient } from "@trpc/client";
 
 import { createRouter } from "@tanstack/react-router";
 
-import { queryClient } from "@/lib/query-client";
-import { trpcClient } from "@/lib/trpc";
+import type { useTRPC } from "@/lib/trpc";
+
 import { routeTree } from "@/routeTree.gen";
 
 export type RouterContext = {
-  queryClient: QueryClient;
-  trpcClient: TRPCClient<AppRouter>;
+  queryClient: QueryClient | null;
+  trpc: ReturnType<typeof useTRPC>;
 };
 
 // Create a new router instance
 export const router = createRouter({
   routeTree,
-  context: {
-    queryClient,
-    trpcClient,
-  } satisfies RouterContext,
   defaultPreload: "intent",
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
+  context: {
+    queryClient: null,
+    trpc: null,
+  } as unknown as RouterContext,
 });
 
 // Register the router instance for type safety

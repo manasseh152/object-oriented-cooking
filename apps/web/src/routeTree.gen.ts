@@ -12,7 +12,8 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as FormsIndexImport } from './routes/forms/index'
+import { Route as RecipesRecipeIdIndexImport } from './routes/recipes/$recipeId/index'
+import { Route as ExamplesFormsIndexImport } from './routes/examples/forms/index'
 
 // Create/Update Routes
 
@@ -22,9 +23,15 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const FormsIndexRoute = FormsIndexImport.update({
-  id: '/forms/',
-  path: '/forms/',
+const RecipesRecipeIdIndexRoute = RecipesRecipeIdIndexImport.update({
+  id: '/recipes/$recipeId/',
+  path: '/recipes/$recipeId/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ExamplesFormsIndexRoute = ExamplesFormsIndexImport.update({
+  id: '/examples/forms/',
+  path: '/examples/forms/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +46,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/forms/': {
-      id: '/forms/'
-      path: '/forms'
-      fullPath: '/forms'
-      preLoaderRoute: typeof FormsIndexImport
+    '/examples/forms/': {
+      id: '/examples/forms/'
+      path: '/examples/forms'
+      fullPath: '/examples/forms'
+      preLoaderRoute: typeof ExamplesFormsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/recipes/$recipeId/': {
+      id: '/recipes/$recipeId/'
+      path: '/recipes/$recipeId'
+      fullPath: '/recipes/$recipeId'
+      preLoaderRoute: typeof RecipesRecipeIdIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +67,42 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/forms': typeof FormsIndexRoute
+  '/examples/forms': typeof ExamplesFormsIndexRoute
+  '/recipes/$recipeId': typeof RecipesRecipeIdIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/forms': typeof FormsIndexRoute
+  '/examples/forms': typeof ExamplesFormsIndexRoute
+  '/recipes/$recipeId': typeof RecipesRecipeIdIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/forms/': typeof FormsIndexRoute
+  '/examples/forms/': typeof ExamplesFormsIndexRoute
+  '/recipes/$recipeId/': typeof RecipesRecipeIdIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/forms'
+  fullPaths: '/' | '/examples/forms' | '/recipes/$recipeId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/forms'
-  id: '__root__' | '/' | '/forms/'
+  to: '/' | '/examples/forms' | '/recipes/$recipeId'
+  id: '__root__' | '/' | '/examples/forms/' | '/recipes/$recipeId/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  FormsIndexRoute: typeof FormsIndexRoute
+  ExamplesFormsIndexRoute: typeof ExamplesFormsIndexRoute
+  RecipesRecipeIdIndexRoute: typeof RecipesRecipeIdIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  FormsIndexRoute: FormsIndexRoute,
+  ExamplesFormsIndexRoute: ExamplesFormsIndexRoute,
+  RecipesRecipeIdIndexRoute: RecipesRecipeIdIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +116,18 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/forms/"
+        "/examples/forms/",
+        "/recipes/$recipeId/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/forms/": {
-      "filePath": "forms/index.tsx"
+    "/examples/forms/": {
+      "filePath": "examples/forms/index.tsx"
+    },
+    "/recipes/$recipeId/": {
+      "filePath": "recipes/$recipeId/index.tsx"
     }
   }
 }

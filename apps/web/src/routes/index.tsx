@@ -1,40 +1,66 @@
-import appLogo from "@/assets/images/app-logo.svg";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
+import { Card } from "@/components/ui/card";
 import { useTRPC } from "@/lib/trpc";
 
 export const Route = createFileRoute("/")({
-  component: App,
+  component: IndexPage,
 });
 
-function App() {
+export function IndexPage() {
   const trpc = useTRPC();
 
-  const { t } = useTranslation("home");
-
-  const health = useQuery(trpc.health.get.queryOptions());
+  const recipeQuery = useQuery(trpc.recipe.getAll.queryOptions());
 
   return (
     <>
-      <header className="w-full h-full flex flex-col items-center justify-center dark:bg-[#282c34] dark:text-white text-[calc(10px+2vmin)]">
-        <img
-          src={appLogo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          {t("editInstructionPrefix")}
-          <code>{t("editInstructionHighlight")}</code>
-          {t("editInstructionSuffix")}
-        </p>
-      </header>
-      <pre className="w-full h-full flex flex-col items-center justify-center dark:bg-[#282c34] dark:text-white text-[calc(10px+2vmin)]">
-        <code>
-          {JSON.stringify(health.data, null, 2)}
-        </code>
-      </pre>
+      <h1 className="text-2xl font-bold">Recipes</h1>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {recipeQuery.isLoading
+          ? (
+              <div className="col-span-full">Loading...</div>
+            )
+          : (
+              recipeQuery.data?.map(recipe => (
+                <Link to="/recipes/$recipeId" params={{ recipeId: recipe.recipeId }} key={recipe.recipeId}>
+                  <Card>
+                    <Card.Header>
+                      <Card.Title>{recipe.title}</Card.Title>
+                    </Card.Header>
+                    <Card.Content>
+                      <p>{recipe.description}</p>
+                    </Card.Content>
+                    <Card.Footer>
+                      <ol className="flex gap-2 text-sm text-muted-foreground">
+                        <li>
+                          <span>
+                            {recipe.cookTime}
+                            {" "}
+                            min
+                          </span>
+                        </li>
+                        <li>
+                          <span>
+                            {recipe.prepTime}
+                            {" "}
+                            min
+                          </span>
+                        </li>
+                        <li>
+                          <span>
+                            {recipe.servings}
+                            {" "}
+                            servings
+                          </span>
+                        </li>
+                      </ol>
+                    </Card.Footer>
+                  </Card>
+                </Link>
+              ))
+            )}
+      </div>
     </>
   );
 }

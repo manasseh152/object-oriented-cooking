@@ -1,4 +1,4 @@
-import { eq, isNotNull } from 'drizzle-orm';
+import * as o from 'drizzle-orm';
 import * as v from 'valibot';
 
 import { measurementUnitInsertSchema, measurementUnitTable, measurementUnitUpdateSchema } from '@/database/schema';
@@ -9,29 +9,19 @@ export const measurementUnitRouter = router({
    * Get all measurement units
    */
   getAll: procedure.query(async ({ ctx }) => {
-    const measurementUnits = await ctx.db
-      .select()
-      .from(measurementUnitTable)
-      .where(isNotNull(measurementUnitTable.id))
-      .orderBy(measurementUnitTable.name);
+    const measurementUnits = await ctx.db.query.measurementUnitTable.findMany({
+      orderBy: o.asc(measurementUnitTable.id),
+      with: {
+        baseUnit: {
+          columns: {
+            measurementUnitId: true,
+          },
+        },
+      },
+    });
 
     return measurementUnits || [];
   }),
-  /**
-   * Get a measurement unit by client id
-   */
-  getById: procedure
-    .input(v.object({ unitId: v.string() }))
-    .query(async ({ ctx, input }) => {
-      const measurementUnit = await ctx.db
-        .select()
-        .from(measurementUnitTable)
-        .where(eq(measurementUnitTable.unitId, input.unitId))
-        .limit(1)
-        .then(measurementUnits => measurementUnits[0]);
-
-      return measurementUnit;
-    }),
   /**
    * Create a new measurement unit
    */
@@ -52,14 +42,14 @@ export const measurementUnitRouter = router({
    */
   update: procedure
     .input(v.object({
-      unitId: v.string(),
+      measurementUnitId: v.string(),
       data: measurementUnitUpdateSchema,
     }))
     .mutation(async ({ ctx, input }) => {
       const measurementUnit = await ctx.db
         .update(measurementUnitTable)
         .set(input.data)
-        .where(eq(measurementUnitTable.unitId, input.unitId))
+        .where(o.eq(measurementUnitTable.measurementUnitId, input.measurementUnitId))
         .returning()
         .then(measurementUnits => measurementUnits[0]);
 
@@ -70,11 +60,11 @@ export const measurementUnitRouter = router({
    * Delete a measurement unit
    */
   delete: procedure
-    .input(v.object({ unitId: v.string() }))
+    .input(v.object({ measurementUnitId: v.string() }))
     .mutation(async ({ ctx, input }) => {
       const measurementUnit = await ctx.db
         .delete(measurementUnitTable)
-        .where(eq(measurementUnitTable.unitId, input.unitId))
+        .where(o.eq(measurementUnitTable.measurementUnitId, input.measurementUnitId))
         .returning()
         .then(measurementUnits => measurementUnits[0]);
 

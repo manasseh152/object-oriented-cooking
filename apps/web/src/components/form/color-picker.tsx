@@ -1,75 +1,66 @@
 /* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
-import type { HTMLAttributes } from 'react';
+import type { ColorPickerProps as PrimitiveColorPickerProps } from "@/components/ui/color-picker";
 
-import { useEffect, useState } from 'react';
+import { ColorPicker as PrimitiveColorPicker } from "@/components/ui/color-picker";
+import { useEffect, useState } from "react";
 
-import { cn } from '@/lib/utils';
+import type { PrimativeFieldProps, PrimativeFormPropsOmit } from "@/lib/utils";
 
-export type FormColorPickerProps = HTMLAttributes<HTMLDivElement> & {
-  value: string;
-  onChange: (value: string) => void;
-  onBlur?: () => void;
-  id?: string;
-  label?: string;
-  disabled?: boolean;
-  className?: string;
-  defaultValue?: string;
-  showColorText?: boolean;
+import { debounce } from "@/lib/utils";
+
+export type ColorPickerProps = Omit<PrimitiveColorPickerProps, PrimativeFormPropsOmit> & PrimativeFieldProps<string | null> & {
+  defaultColor?: `#${string}`; // Optional default color in hex format
 };
 
-export function FormColorPicker(props: FormColorPickerProps) {
+export function ColorPicker(props: ColorPickerProps) {
   const {
+    name,
     value,
     onChange,
     onBlur,
-    id,
-    label,
-    disabled,
     className,
-    defaultValue,
-    showColorText,
+    disabled,
+    defaultColor = "#000000", // Default color set to black
     ...restProps
   } = props;
 
-  const [color, setColor] = useState<string>(defaultValue || '#000000');
+  const [color, setColor] = useState(value ?? defaultColor ?? "");
+  const id = `color-picker-${name}`;
 
-  // Keep the UI display in sync with the value
   useEffect(() => {
-    if (value) {
-      setColor(value);
-    }
-  }, [value]);
+    setColor(value ?? defaultColor ?? "");
+  }, [defaultColor, value]);
 
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = e.target.value;
-    setColor(newColor);
-    onChange(newColor);
-  };
+  useEffect(() => {
+    const debouncedOnChange = debounce((color: string) => {
+      if (color === "") {
+        onChange(null);
+      }
+      else {
+        onChange(color);
+      }
+    }, 500);
+
+    debouncedOnChange(color);
+
+    return () => debouncedOnChange.cancel();
+  }, [color, onChange]);
+
+  function handleColorChange(color: string) {
+    setColor(color);
+  }
 
   return (
-    <div className={cn('space-y-2', className)} {...restProps}>
-      {label && (
-        <label
-          htmlFor={id}
-          className="block text-sm font-medium"
-        >
-          {label}
-        </label>
-      )}
-      <div className="flex items-center gap-3">
-        <input
-          id={id}
-          type="color"
-          value={color}
-          onChange={handleColorChange}
-          onBlur={onBlur}
-          disabled={disabled}
-          className="h-10 w-10 cursor-pointer rounded-md border border-input p-1"
-        />
-        {showColorText && (
-          <div className="text-sm">{color}</div>
-        )}
-      </div>
-    </div>
+    <PrimitiveColorPicker
+      {...restProps}
+      id={id}
+      name={name}
+      value={color}
+      onChange={handleColorChange}
+      onBlur={onBlur}
+      disabled={disabled}
+    />
   );
 }
+
+ColorPicker.displayName = "ColorPicker";

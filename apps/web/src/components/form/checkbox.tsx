@@ -1,51 +1,45 @@
 /* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
-import type { HTMLAttributes } from 'react';
+import { useEffect, useState } from "react";
 
-import { useEffect, useState } from 'react';
+import { Checkbox as PrimativeCheckbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
-import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
+import type { PrimativeFieldProps, PrimativeLabelType } from "../../lib/utils";
 
-export type FormCheckboxProps = HTMLAttributes<HTMLDivElement> & {
-  value: boolean;
-  onChange: (value: boolean) => void;
-  onBlur?: () => void;
-  id?: string;
-  label?: string;
-  disabled?: boolean;
-  className?: string;
+export type CheckboxProps = PrimativeFieldProps<boolean | null> & {
+  label?: PrimativeLabelType;
+  defaultChecked?: boolean; // Optional default checked state
 };
 
-export function FormCheckbox(props: FormCheckboxProps) {
-  const { value, onChange, onBlur, id, label, disabled, className, ...restProps } = props;
-  const [checked, setChecked] = useState<boolean>(false);
+export function Checkbox(props: CheckboxProps) {
+  const { id, name, value, onChange, onBlur, label, disabled, defaultChecked = false } = props;
 
-  // Keep the UI display in sync with the value
+  const [checked, setChecked] = useState(value ?? defaultChecked);
+
   useEffect(() => {
     setChecked(!!value);
   }, [value]);
 
-  const handleCheckedChange = (checked: boolean) => {
+  function handleCheckedChange(checked: boolean) {
     onChange(checked);
-  };
+  }
 
   return (
-    <div className={cn('flex items-center gap-2', className)} {...restProps}>
-      <Checkbox
-        id={id}
+    <Label
+      className="flex items-center space-x-2"
+      disabled={disabled}
+    >
+      <PrimativeCheckbox
+        id={id ?? `checkbox-${name}`}
+        name={name}
         checked={checked}
         onCheckedChange={handleCheckedChange}
-        disabled={disabled}
         onBlur={onBlur}
+        disabled={disabled}
       />
-      {label && (
-        <label
-          htmlFor={id}
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          {label}
-        </label>
-      )}
-    </div>
+      {label && <span className="text-sm">{label}</span>}
+    </Label>
   );
 }
+
+Checkbox.displayName = "Checkbox";

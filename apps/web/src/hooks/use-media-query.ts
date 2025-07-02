@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export type MediaQueryChangeHandler = (event: MediaQueryListEvent) => void;
 
@@ -26,7 +26,7 @@ export function useMediaQuery(query: string): boolean {
 
     // Add an event listener to the media query list object.
     mediaQueryMatch.addEventListener(
-      'change',
+      "change",
       (event) => {
         setValue(event.matches);
       },

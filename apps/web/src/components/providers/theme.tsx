@@ -1,13 +1,13 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from "react";
 
-import type { Theme } from '@/config/theme';
+import type { Theme } from "@/config/theme";
 
-import { THEME_DEFAULT, THEME_STORAGE_KEY, THEMES } from '@/config/theme';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { useMediaQuery } from '@/hooks/use-media-query';
-import { ThemeProviderContext } from '@/hooks/use-theme';
+import { THEME_DEFAULT, THEME_STORAGE_KEY, THEMES } from "@/config/theme";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { ThemeProviderContext } from "@/hooks/use-theme";
 
 type ThemeProviderProps = {
   children: ReactNode;
@@ -21,15 +21,15 @@ export function ThemeProvider({
   storageKey = THEME_STORAGE_KEY,
 }: ThemeProviderProps) {
   const [theme, setTheme] = useLocalStorage<Theme>(storageKey, defaultTheme);
-  const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
+  const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
 
   useEffect(() => {
     const root = window.document.documentElement;
 
     root.classList.remove(...THEMES);
 
-    if (theme === 'system')
-      root.classList.add(prefersDark ? 'dark' : 'light');
+    if (theme === "system")
+      root.classList.add(prefersDark ? "dark" : "light");
     else
       root.classList.add(theme);
   }, [prefersDark, theme]);
@@ -45,4 +45,4 @@ export function ThemeProvider({
     </ThemeProviderContext>
   );
 }
-ThemeProvider.displayName = 'ThemeProvider';
+ThemeProvider.displayName = "ThemeProvider";

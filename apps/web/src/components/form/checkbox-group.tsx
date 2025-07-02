@@ -1,114 +1,127 @@
 /* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
-import type { HTMLAttributes } from 'react';
+import type { ComponentPropsWithRef, HTMLAttributes, ReactNode } from "react";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
+import type { Option } from "@/lib/option";
 
-import type { PrimitiveValueType } from './form-utils';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { createValueMapsFromOptions } from "@/lib/option";
+import { cn } from "@/lib/utils";
 
-import { createValueMapsFromOptions } from './form-utils';
+import type { PrimativeFieldProps, PrimativeFormPropsOmit, PrimitiveValueType } from "../../lib/utils";
 
-export type Option<T extends PrimitiveValueType> = {
-  label: string;
-  value: T;
+export type CheckboxGroupOption<T extends PrimitiveValueType> = Option<T> & {};
+
+export type CheckboxGroupItemProps<T extends PrimitiveValueType> = Omit<ComponentPropsWithRef<typeof Checkbox>, "onCheckedChange"> & {
+  option: CheckboxGroupOption<T>;
+  name?: string;
+  stringValue: string;
+  disabled?: boolean;
+  isChecked: boolean;
+  onCheckedChange: (checked: boolean, option: Option<T>) => void;
 };
 
-export type FormCheckboxGroupProps<T extends PrimitiveValueType> =
-  HTMLAttributes<HTMLDivElement> & {
-    value: T[];
-    onChange: (value: T[]) => void;
-    onBlur?: () => void;
-    options: Option<T>[];
-    label?: string;
-    className?: string;
-    disabled?: boolean;
-    orientation?: 'horizontal' | 'vertical';
-  };
+export function DefaultCheckboxGroupItem<T extends PrimitiveValueType>({
+  name,
+  option,
+  stringValue,
+  disabled,
+  isChecked,
+  onCheckedChange,
+  ...props
+}: CheckboxGroupItemProps<T>) {
+  const id = `checkbox-group-${name}-${stringValue}`;
 
-export function FormCheckboxGroup<T extends PrimitiveValueType>(
-  props: FormCheckboxGroupProps<T>,
-) {
+  return (
+    <Label key={stringValue} disabled={disabled} className="flex flex-row items-center gap-2 cursor-pointer">
+      <Checkbox
+        id={id}
+        checked={isChecked}
+        onCheckedChange={checked => onCheckedChange(!!checked, option)}
+        disabled={disabled}
+        {...props}
+      />
+      <span className="text-sm">{option.label}</span>
+    </Label>
+  );
+}
+
+DefaultCheckboxGroupItem.displayName = "DefaultCheckboxGroupItem";
+
+export type CheckboxGroupProps<T extends PrimitiveValueType> = Omit<HTMLAttributes<HTMLDivElement>, PrimativeFormPropsOmit> & PrimativeFieldProps<T[]> & {
+  options: CheckboxGroupOption<T>[];
+  orientation?: "horizontal" | "vertical";
+  renderItem?: (props: CheckboxGroupItemProps<T>) => ReactNode;
+};
+
+export function CheckboxGroup<T extends PrimitiveValueType>(props: CheckboxGroupProps<T>) {
   const {
+    name,
     value,
     onChange,
     onBlur,
     options,
-    label,
     className,
     disabled,
-    orientation = 'vertical',
+    orientation = "vertical",
+    renderItem: RenderItem = DefaultCheckboxGroupItem,
     ...restProps
   } = props;
 
   const [selectedValues, setSelectedValues] = useState<T[]>([]);
 
-  // Create maps to convert between primitive values and string representations
-  const { valueToString } = useMemo(() => {
-    return createValueMapsFromOptions(options);
-  }, [options]);
+  const { valueToString } = useMemo(() => createValueMapsFromOptions(options), [options]);
 
-  // Keep the UI display in sync with the value
   useEffect(() => {
     setSelectedValues(value || []);
   }, [value]);
 
-  const handleCheckedChange = (checked: boolean, optionValue: T) => {
-    let newValues: T[];
+  function handleCheckedChange(checked: boolean, option: Option<T>) {
+    const newValue = checked
+      ? [...selectedValues, option.value]
+      : selectedValues.filter(v => v !== option.value);
 
-    if (checked) {
-      newValues = [...selectedValues, optionValue];
-    }
-    else {
-      // Using a loose equality check to handle things like 1 and "1"
-      newValues = selectedValues.filter(v => v !== optionValue);
-    }
+    onChange(newValue);
+  }
 
-    onChange(newValues);
-  };
-
-  // Helper to check if a value is in the selected values
-  const isValueSelected = (optionValue: T): boolean => {
-    return selectedValues.includes(optionValue);
-  };
+  function isOptionChecked(option: Option<T>) {
+    return selectedValues.includes(option.value);
+  }
 
   return (
-    <div className={className} {...restProps}>
-      {label && <div className="mb-2 font-medium">{label}</div>}
-      <div
-        className={cn(
-          orientation === 'vertical'
-            ? 'flex flex-col gap-2'
-            : 'flex flex-row flex-wrap gap-4',
-        )}
-      >
-        {options.map((option) => {
-          const stringValue
-            = valueToString.get(option.value) || String(option.value);
-          const id = `checkbox-${stringValue}`;
-          const isChecked = isValueSelected(option.value);
+    <div
+      className={cn(
+        "flex gap-2",
+        orientation === "horizontal" ? "flex-row" : "flex-col",
+        className,
+      )}
+      {...restProps}
+    >
+      {options.map((option) => {
+        const stringValue = valueToString.get(option.value) || String(option.value);
 
-          return (
-            <div key={stringValue} className="flex items-center gap-2">
-              <Checkbox
-                id={id}
-                checked={isChecked}
-                onCheckedChange={checked =>
-                  handleCheckedChange(!!checked, option.value)}
-                disabled={disabled}
-                onBlur={onBlur}
-              />
-              <label
-                htmlFor={id}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {option.label}
-              </label>
-            </div>
-          );
-        })}
-      </div>
+        function itemOnCheckedChange(checked: boolean, opt: Option<T>) {
+          handleCheckedChange(checked, opt);
+        };
+
+        return (
+          <RenderItem
+            key={`checkbox-group-${name}-${stringValue}`}
+            name={name}
+            option={option}
+            stringValue={stringValue}
+            isChecked={isOptionChecked(option)}
+            onCheckedChange={itemOnCheckedChange}
+            disabled={disabled}
+            onBlur={onBlur}
+          />
+        );
+      })}
     </div>
   );
 }
+
+CheckboxGroup.displayName = "CheckboxGroup";
+CheckboxGroup.Item = DefaultCheckboxGroupItem;

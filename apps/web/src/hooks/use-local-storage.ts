@@ -1,15 +1,15 @@
 import type {
   Dispatch,
   SetStateAction,
-} from 'react';
+} from "react";
 
 import {
   useCallback,
   useEffect,
   useState,
-} from 'react';
+} from "react";
 
-import { logger } from '@/lib/logger';
+import { logger } from "@/lib/logger";
 
 // Helper function to safely parse JSON
 function safeJsonParse<T>(jsonString: string | null): T | null {
@@ -20,7 +20,7 @@ function safeJsonParse<T>(jsonString: string | null): T | null {
     return JSON.parse(jsonString) as T;
   }
   catch (error) {
-    logger.error('Error parsing JSON from localStorage:', error);
+    logger.error("Error parsing JSON from localStorage:", error);
     return null; // Return null if parsing fails
   }
 }
@@ -31,7 +31,7 @@ function safeJsonStringify<T>(value: T): string | null {
     return JSON.stringify(value);
   }
   catch (error) {
-    logger.error('Error stringifying value for localStorage:', error);
+    logger.error("Error stringifying value for localStorage:", error);
     return null; // Return null if stringify fails
   }
 }
@@ -70,7 +70,7 @@ export function useLocalStorage<T>(
   // Function to read the value from localStorage safely
   const readValue = useCallback((): T => {
     // Prevent build errors and errors during server-side rendering
-    if (typeof window === 'undefined' || !window.localStorage) {
+    if (typeof window === "undefined" || !window.localStorage) {
       return getInitialValue();
     }
 
@@ -99,7 +99,7 @@ export function useLocalStorage<T>(
   const setValue: Dispatch<SetStateAction<T>> = useCallback(
     (valueOrFn) => {
       // Prevent build errors and errors during server-side rendering
-      if (typeof window === 'undefined' || !window.localStorage) {
+      if (typeof window === "undefined" || !window.localStorage) {
         logger.warn(`Tried setting localStorage key “${key}” even though environment is not a browser.`);
         // Still update the state in memory for SSR/static export consistency
         setStoredValue(valueOrFn);
@@ -123,7 +123,7 @@ export function useLocalStorage<T>(
           // so we need this custom event for same-tab updates if multiple
           // hooks use the same key.
           window.dispatchEvent(
-            new StorageEvent('storage', {
+            new StorageEvent("storage", {
               key,
               newValue: stringifiedValue,
               storageArea: window.localStorage,
@@ -151,7 +151,7 @@ export function useLocalStorage<T>(
   // Function to remove the item from localStorage
   const removeValue = useCallback(() => {
     // Prevent build errors and errors during server-side rendering
-    if (typeof window === 'undefined' || !window.localStorage) {
+    if (typeof window === "undefined" || !window.localStorage) {
       logger.warn(`Tried removing localStorage key “${key}” even though environment is not a browser.`);
       // Reset state in memory anyway
       setStoredValue(getInitialValue());
@@ -166,7 +166,7 @@ export function useLocalStorage<T>(
 
       // Dispatch event to notify other hooks/tabs
       window.dispatchEvent(
-        new StorageEvent('storage', {
+        new StorageEvent("storage", {
           key,
           newValue: null, // Indicate removal
           storageArea: window.localStorage,
@@ -213,11 +213,11 @@ export function useLocalStorage<T>(
     };
 
     // Add event listener
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
 
     // Clean up event listener on unmount
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
     };
     // Only re-run the effect if key or initialValue changes
   }, [key, initialValue, getInitialValue]);

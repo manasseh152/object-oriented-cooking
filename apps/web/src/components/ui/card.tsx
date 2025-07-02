@@ -1,98 +1,50 @@
-import type { HTMLProps } from 'react';
+import * as React from "react";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
-export type CardProps = HTMLProps<HTMLDivElement> & {};
-function Card({ className, ...props }: CardProps) {
-  return (
-    <div
-      data-slot="card"
-      className={cn(
-        'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm',
-        className,
-      )}
-      {...props}
-    />
-  );
+export type CardProps = React.HTMLAttributes<HTMLDivElement>;
+export type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+export type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+export type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
+export type CardContentProps = React.HTMLAttributes<HTMLDivElement>;
+export type CardFooterProps = React.HTMLAttributes<HTMLDivElement>;
+
+function Card({ ref, className, ...props }: CardProps & { ref?: React.RefObject<HTMLDivElement | null> }) {
+  return <div ref={ref} data-slot="card" className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)} {...props} />;
 }
+Card.displayName = "Card";
 
-export type CardHeaderProps = HTMLProps<HTMLDivElement> & {};
-function CardHeader({ className, ...props }: CardHeaderProps) {
-  return (
-    <div
-      data-slot="card-header"
-      className={cn(
-        '@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6',
-        className,
-      )}
-      {...props}
-    />
-  );
+function CardHeader({ ref, className, ...props }: CardHeaderProps & { ref?: React.RefObject<HTMLDivElement | null> }) {
+  return <div ref={ref} data-slot="card-header" className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />;
 }
+CardHeader.displayName = "CardHeader";
 
-export type CardTitleProps = HTMLProps<HTMLDivElement> & {};
-function CardTitle({ className, ...props }: CardTitleProps) {
-  return (
-    <div
-      data-slot="card-title"
-      className={cn('leading-none font-semibold', className)}
-      {...props}
-    />
-  );
+function CardTitle({ ref, className, ...props }: CardTitleProps & { ref?: React.RefObject<HTMLHeadingElement | null> }) {
+  return <h3 ref={ref} data-slot="card-title" className={cn("text-2xl font-semibold leading-none tracking-tight", className)} {...props} />;
 }
+CardTitle.displayName = "CardTitle";
 
-export type CardDescriptionProps = HTMLProps<HTMLDivElement> & {};
-function CardDescription({ className, ...props }: CardDescriptionProps) {
-  return (
-    <div
-      data-slot="card-description"
-      className={cn('text-muted-foreground text-sm', className)}
-      {...props}
-    />
-  );
+function CardDescription({ ref, className, ...props }: CardDescriptionProps & { ref?: React.RefObject<HTMLParagraphElement | null> }) {
+  return <p ref={ref} data-slot="card-description" className={cn("text-sm text-muted-foreground", className)} {...props} />;
 }
+CardDescription.displayName = "CardDescription";
 
-export type CardActionProps = HTMLProps<HTMLDivElement> & {};
-function CardAction({ className, ...props }: CardActionProps) {
-  return (
-    <div
-      data-slot="card-action"
-      className={cn(
-        'col-start-2 row-span-2 row-start-1 self-start justify-self-end',
-        className,
-      )}
-      {...props}
-    />
-  );
+function CardContent({ ref, className, ...props }: CardContentProps & { ref?: React.RefObject<HTMLDivElement | null> }) {
+  return <div ref={ref} data-slot="card-content" className={cn("p-6 pt-0", className)} {...props} />;
 }
+CardContent.displayName = "CardContent";
 
-export type CardContentProps = HTMLProps<HTMLDivElement> & {};
-function CardContent({ className, ...props }: CardContentProps) {
-  return (
-    <div
-      data-slot="card-content"
-      className={cn('px-6', className)}
-      {...props}
-    />
-  );
+function CardFooter({ ref, className, ...props }: CardFooterProps & { ref?: React.RefObject<HTMLDivElement | null> }) {
+  return <div ref={ref} data-slot="card-footer" className={cn("flex items-center p-6 pt-0", className)} {...props} />;
 }
+CardFooter.displayName = "CardFooter";
 
-export type CardFooterProps = HTMLProps<HTMLDivElement> & {};
-function CardFooter({ className, ...props }: CardFooterProps) {
-  return (
-    <div
-      data-slot="card-footer"
-      className={cn('flex items-center px-6 [.border-t]:pt-6', className)}
-      {...props}
-    />
-  );
-}
+const CardCompound = Object.assign(Card, {
+  Header: CardHeader,
+  Footer: CardFooter,
+  Title: CardTitle,
+  Description: CardDescription,
+  Content: CardContent,
+});
 
-Card.Header = CardHeader;
-Card.Title = CardTitle;
-Card.Description = CardDescription;
-Card.Action = CardAction;
-Card.Content = CardContent;
-Card.Footer = CardFooter;
-
-export { Card };
+export { CardCompound as Card };

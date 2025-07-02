@@ -1,7 +1,7 @@
-import type { Logger as ILogger, LogEntry, LoggerOptions, LogLevel, Transport } from '@/config/logger';
+import type { Logger as ILogger, LogEntry, LoggerOptions, LogLevel, Transport } from "@/config/logger";
 
-import { env } from '@/config/env';
-import { DEFAULT_LOG_LEVEL, DEFAULT_TRANSPORTS, LOG_LEVELS } from '@/config/logger';
+import { env } from "@/config/env";
+import { DEFAULT_LOG_LEVEL, DEFAULT_TRANSPORTS, LOG_LEVELS } from "@/config/logger";
 
 export class Logger implements ILogger {
   private _name: string;
@@ -43,19 +43,19 @@ export class Logger implements ILogger {
   }
 
   public debug(...messages: any[]): void {
-    this.log('DEBUG', ...messages);
+    this.log("DEBUG", ...messages);
   }
 
   public info(...messages: any[]): void {
-    this.log('INFO', ...messages);
+    this.log("INFO", ...messages);
   }
 
   public warn(...messages: any[]): void {
-    this.log('WARN', ...messages);
+    this.log("WARN", ...messages);
   }
 
   public error(...messages: any[]): void {
-    this.log('ERROR', ...messages);
+    this.log("ERROR", ...messages);
   }
 }
 
@@ -64,6 +64,6 @@ export function createLogger(options: LoggerOptions): ILogger {
 }
 
 export const logger = createLogger({
-  name: 'default',
-  level: env.dev ? 'DEBUG' : 'INFO',
+  name: "default",
+  level: env.dev ? "DEBUG" : "INFO",
 });

@@ -1,5 +1,4 @@
-import { useTranslation } from 'react-i18next';
-import * as v from 'valibot';
+import { useTranslation } from "react-i18next";
 
 import {
   Select,
@@ -7,33 +6,20 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { LANGUAGES, LanguageSchema } from '@/config/language';
-import { useLanguage } from '@/hooks/use-translation';
-import { logger } from '@/lib/logger';
+} from "@/components/ui/select";
+import { LANGUAGES } from "@/config/language";
+import { setLanguage } from "@/lib/i18n";
 
 export function LanguageSelector() {
-  const { t } = useTranslation('language-selector');
-  const { language, setLanguage } = useLanguage();
-
-  function handleLanguageChange(value: string) {
-    const parsedValue = v.safeParse(LanguageSchema, value);
-
-    if (!parsedValue.success) {
-      logger.error(`LanguageSelector: Failed to parse language value: ${value}.`, { parsedValue });
-      return;
-    }
-
-    setLanguage(parsedValue.output);
-  }
+  const { t, i18n } = useTranslation("language-selector");
 
   return (
     <Select
-      defaultValue={language}
-      onValueChange={handleLanguageChange}
+      defaultValue={i18n.language}
+      onValueChange={setLanguage}
     >
-      <SelectTrigger className="w-[180px]" title={t('languageSelectorTitle')} aria-label={t('languageSelectorAriaLabel')} aria-description={t('languageSelectorAriaDescription')}>
-        <SelectValue placeholder={t('selectPlaceholder')} />
+      <SelectTrigger className="w-[180px]" title={t("languageSelectorTitle")} aria-label={t("languageSelectorAriaLabel")} aria-description={t("languageSelectorAriaDescription")}>
+        <SelectValue placeholder={t("selectPlaceholder")} />
       </SelectTrigger>
       <SelectContent>
         {LANGUAGES.map(language => (

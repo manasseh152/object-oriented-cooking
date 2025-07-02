@@ -1,8 +1,8 @@
-import { env } from '@/config/env';
-import { ConsoleTransport } from '@/lib/logger.console';
+import { env } from "@/config/env";
+import { ConsoleTransport } from "@/lib/logger.console";
 
-export const DEFAULT_LOG_LEVEL: Readonly<LogLevel> = 'INFO';
-export const DEFAULT_TRANSPORTS: ReadonlyArray<Transport> = [new ConsoleTransport({ level: env.dev ? 'DEBUG' : 'INFO' })];
+export const DEFAULT_LOG_LEVEL: Readonly<LogLevel> = "INFO";
+export const DEFAULT_TRANSPORTS: ReadonlyArray<Transport> = [new ConsoleTransport({ level: env.dev ? "DEBUG" : "INFO" })];
 
 export const LOG_LEVELS = {
   DEBUG: 0,

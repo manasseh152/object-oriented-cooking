@@ -1,14 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
-import type { FC } from 'react';
+import type { FC } from "react";
 
-import { picklist } from 'valibot';
+import { picklist } from "valibot";
 
-export const SUPPORTED_LANGUAGES = [
-  'en',
-  'nl',
-] as const;
+export const LOCAL_STORAGE_KEY = "language";
+export const SUPPORTED_LANGUAGES = ["en"] as const;
 export type SupportedLanguages = typeof SUPPORTED_LANGUAGES[number];
-export const LanguageSchema = picklist(SUPPORTED_LANGUAGES, 'value is not a valid language');
+export const LanguageSchema = picklist(SUPPORTED_LANGUAGES, "value is not a valid language");
 
 export type Language = {
   code: SupportedLanguages;
@@ -18,14 +16,9 @@ export type Language = {
 
 export const LANGUAGES: Language[] = [
   {
-    code: 'en',
-    name: 'English',
+    code: "en",
+    name: "English",
     icon: () => <span>🇬🇧</span>,
-  },
-  {
-    code: 'nl',
-    name: 'Nederlands',
-    icon: () => <span>🇳🇱</span>,
   },
 ];
 

@@ -4,8 +4,6 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 
 import { env } from '@/config/env';
-import { db } from '@/database';
-import { s3 } from '@/lib/object-store';
 import { appRouter } from '@/routers/_app.router';
 import { createContext } from '@/trpc/context';
 
@@ -23,14 +21,9 @@ app.use('*', cors({
 app.get('/health', c => c.json({ status: 'ok' }));
 
 // Mount tRPC API
-app.use('/trpc', trpcServer({
+app.use('/trpc/*', trpcServer({
   router: appRouter,
-  createContext: () => {
-    return createContext({
-      db,
-      s3,
-    });
-  },
+  createContext,
 }));
 
 // Export for Bun
